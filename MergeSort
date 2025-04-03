@@ -1,0 +1,58 @@
+import java.util.Arrays;
+
+public class MergeSort<T extends Comparable<T>> {
+    private T[] array;
+
+    public MergeSort(T[] array) {
+        this.array = Arrays.copyOf(array, array.length);
+    }
+
+    public T[] getArray() {
+        return array;
+    }
+
+    public void mergeSortDescending() {
+        mergeSortRecursive(array, 0, array.length - 1, true);
+    }
+
+    public void mergeSortInRange(int leftIndex, int rightIndex, boolean ascending) {
+        mergeSortRecursive(array, leftIndex, rightIndex, ascending);
+    }
+
+    private void mergeSortRecursive(T[] array, int leftIndex, int rightIndex, boolean descending) {
+        if (rightIndex - leftIndex <= 0) return;
+
+        int middle = (leftIndex + rightIndex) / 2;
+
+        T[] leftArray = Arrays.copyOfRange(array, leftIndex, middle + 1);
+        T[] rightArray = Arrays.copyOfRange(array, middle + 1, rightIndex + 1);
+
+        mergeSortRecursive(leftArray, 0, leftArray.length - 1, descending);
+        mergeSortRecursive(rightArray, 0, rightArray.length - 1, descending);
+
+        merge(array, leftArray, rightArray, leftIndex, descending);
+    }
+
+    private void merge(T[] array, T[] leftArray, T[] rightArray, int leftIndex, boolean descending) {
+        int leftPointer = 0;
+        int rightPointer = 0;
+        int mergedPointer = leftIndex;
+
+        while (leftPointer < leftArray.length && rightPointer < rightArray.length) {
+            if (descending ? leftArray[leftPointer].compareTo(rightArray[rightPointer]) >= 0
+                    : leftArray[leftPointer].compareTo(rightArray[rightPointer]) <= 0) {
+                array[mergedPointer++] = leftArray[leftPointer++];
+            } else {
+                array[mergedPointer++] = rightArray[rightPointer++];
+            }
+        }
+
+        while (leftPointer < leftArray.length) {
+            array[mergedPointer++] = leftArray[leftPointer++];
+        }
+
+        while (rightPointer < rightArray.length) {
+            array[mergedPointer++] = rightArray[rightPointer++];
+        }
+    }
+}
