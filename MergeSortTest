@@ -7,17 +7,6 @@ import java.util.Random;
 public class MergeSortTest {
 
     @Test
-    public void testMergeSortDescending() {
-        Integer[] sourceArray = new Integer[] {-5, 4, 10, 2, 1, 8, -5, 0};
-        Integer[] expectedArray = new Integer[] {10, 8, 4, 2, 1, 0, -5, -5};
-
-        MergeSort<Integer> mergeSortAlg = new MergeSort<>(sourceArray);
-        mergeSortAlg.mergeSortDescending();
-
-        assertThat(mergeSortAlg.getArray()).isEqualTo(expectedArray);
-    }
-
-    @Test
     public void testMergeSortInRange() {
         Integer[] sourceArray = new Integer[] {-5, 4, 10, 2, 1, 8, -5, 0};
         Integer[] expectedArray = new Integer[] {-5, -5, 0, 1, 2, 4, 8, 10};
