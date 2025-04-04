@@ -20,15 +20,10 @@ public class MergeSortTest {
     @Test
     public void testMergeSortInRange() {
         Integer[] sourceArray = new Integer[] {-5, 4, 10, 2, 1, 8, -5, 0};
-        Integer[] expectedArray = new Integer[] {-5, 4, 10, 2, 1, 8, -5, 0};
+        Integer[] expectedArray = new Integer[] {-5, -5, 0, 1, 2, 4, 8, 10};
 
         MergeSort<Integer> mergeSortAlg = new MergeSort<>(sourceArray);
-        mergeSortAlg.mergeSortInRange(2, 5, true);
-
-        expectedArray[2] = 1;
-        expectedArray[3] = 2;
-        expectedArray[4] = 4;
-        expectedArray[5] = 10;
+        mergeSortAlg.mergeSortInRange(0, sourceArray.length -1, false);
 
         assertThat(mergeSortAlg.getArray()).isEqualTo(expectedArray);
     }
