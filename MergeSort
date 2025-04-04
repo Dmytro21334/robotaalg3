@@ -1,21 +1,15 @@
 import java.util.Arrays;
 
-public class MergeSort<T extends Comparable<T>> {
-    private T[] array;
+public record MergeSort<T extends Comparable<T>>(T[] array) {
 
     public MergeSort(T[] array) {
         this.array = Arrays.copyOf(array, array.length);
     }
 
-    public T[] getArray() {
-        return array;
-    }
-
-    public void mergeSortDescending() {
-        mergeSortRecursive(array, 0, array.length - 1, true);
-    }
-
     public void mergeSortInRange(int leftIndex, int rightIndex, boolean ascending) {
+        if (leftIndex < 0 || rightIndex >= array.length || leftIndex >= rightIndex) {
+            throw new IllegalArgumentException("Invalid range");
+        }
         mergeSortRecursive(array, leftIndex, rightIndex, ascending);
     }
 
@@ -24,35 +18,34 @@ public class MergeSort<T extends Comparable<T>> {
 
         int middle = (leftIndex + rightIndex) / 2;
 
-        T[] leftArray = Arrays.copyOfRange(array, leftIndex, middle + 1);
-        T[] rightArray = Arrays.copyOfRange(array, middle + 1, rightIndex + 1);
+        mergeSortRecursive(array, leftIndex, middle, descending);
+        mergeSortRecursive(array, middle + 1, rightIndex, descending);
 
-        mergeSortRecursive(leftArray, 0, leftArray.length - 1, descending);
-        mergeSortRecursive(rightArray, 0, rightArray.length - 1, descending);
-
-        merge(array, leftArray, rightArray, leftIndex, descending);
+        merge(array, leftIndex, middle, rightIndex, descending);
     }
 
-    private void merge(T[] array, T[] leftArray, T[] rightArray, int leftIndex, boolean descending) {
-        int leftPointer = 0;
-        int rightPointer = 0;
-        int mergedPointer = leftIndex;
+    private void merge(T[] array, int leftIndex, int middle, int rightIndex, boolean descending) {
+        int leftPointer = leftIndex;
+        int rightPointer = middle + 1;
+        T[] tempArray = Arrays.copyOf(array, array.length);
 
-        while (leftPointer < leftArray.length && rightPointer < rightArray.length) {
-            if (descending ? leftArray[leftPointer].compareTo(rightArray[rightPointer]) >= 0
-                    : leftArray[leftPointer].compareTo(rightArray[rightPointer]) <= 0) {
-                array[mergedPointer++] = leftArray[leftPointer++];
+        for (int i = leftIndex; i <= rightIndex; i++) {
+            if (leftPointer <= middle && (rightPointer > rightIndex ||
+                    (descending ? array[leftPointer].compareTo(array[rightPointer]) >= 0
+                            : array[leftPointer].compareTo(array[rightPointer]) <= 0))) {
+                tempArray[i] = array[leftPointer++];
             } else {
-                array[mergedPointer++] = rightArray[rightPointer++];
+                tempArray[i] = array[rightPointer++];
             }
         }
 
-        while (leftPointer < leftArray.length) {
-            array[mergedPointer++] = leftArray[leftPointer++];
-        }
+        System.arraycopy(tempArray, leftIndex, array, leftIndex, rightIndex - leftIndex + 1);
+    }
 
-        while (rightPointer < rightArray.length) {
-            array[mergedPointer++] = rightArray[rightPointer++];
-        }
+    public T[] getArray() {
+        return array;
+    }
+
+    public void mergeSortDescending() {
     }
 }
