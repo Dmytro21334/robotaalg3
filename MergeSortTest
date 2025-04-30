@@ -1,39 +1,67 @@
 import org.junit.jupiter.api.Test;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Random;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class MergeSortTest {
 
     @Test
-    public void testMergeSortInRange() {
-        Integer[] sourceArray = new Integer[] {-5, 4, 10, 2, 1, 8, -5, 0};
-        Integer[] expectedArray = new Integer[] {-5, -5, 0, 1, 2, 4, 8, 10};
+    public void testMergeSortDescending() {
+        Integer[] source = new Integer[] {3, 1, 4, 2};
+        Integer[] expected = source.clone();
+        Arrays.sort(expected, Comparator.reverseOrder());
 
-        MergeSort<Integer> mergeSortAlg = new MergeSort<>(sourceArray);
-        mergeSortAlg.mergeSortInRange(0, sourceArray.length -1, false);
+        MergeSort<Integer> sorter = new MergeSort<>(source);
+        sorter.mergeSortDescending();
 
-        assertThat(mergeSortAlg.getArray()).isEqualTo(expectedArray);
+        assertThat(sorter.getArray())
+                .as("Масив має бути відсортований за спаданням")
+                .isEqualTo(expected);
     }
 
     @Test
-    public void testSortingPerformance() {
+    public void testMergeSortInRangeAscending() {
+        Integer[] source = new Integer[] {-5, 4, 10, 2, 1, 8, -5, 0};
+        Integer[] expected = source.clone();
+
+        // Відсортуємо вручну піддіапазон [2, 5]
+        Arrays.sort(expected, 2, 6); // [10, 2, 1, 8] → [1, 2, 8, 10]
+
+        MergeSort<Integer> sorter = new MergeSort<>(source);
+        sorter.mergeSortInRange(2, 5, true);
+
+        assertThat(sorter.getArray())
+                .as("Елементи в діапазоні 2–5 мають бути відсортовані за зростанням")
+                .isEqualTo(expected);
+    }
+
+    @Test
+    public void testSortingPerformanceComparison() {
         Random random = new Random();
-        int size = 10000;
-        Integer[] array = random.ints(size, 0, 100000).boxed().toArray(Integer[]::new);
+        int size = 10_000;
+        Integer[] data = random.ints(size, 0, 100_000).boxed().toArray(Integer[]::new);
 
-        Integer[] arrayCopy1 = Arrays.copyOf(array, array.length);
-        long startTime = System.currentTimeMillis();
-        MergeSort<Integer> mergeSort = new MergeSort<>(arrayCopy1);
-        mergeSort.mergeSortDescending();
-        long endTime = System.currentTimeMillis();
-        System.out.println("MergeSort Time: " + (endTime - startTime) + "ms");
+        Integer[] mergeArray = data.clone();
+        long start = System.currentTimeMillis();
+        MergeSort<Integer> sorter = new MergeSort<>(mergeArray);
+        sorter.mergeSortDescending();
+        long mergeTime = System.currentTimeMillis() - start;
 
-        Integer[] arrayCopy2 = Arrays.copyOf(array, array.length);
-        startTime = System.currentTimeMillis();
-        Arrays.sort(arrayCopy2);
-        endTime = System.currentTimeMillis();
-        System.out.println("QuickSort Time: " + (endTime - startTime) + "ms");
+        Integer[] quickArray = data.clone();
+        start = System.currentTimeMillis();
+        Arrays.sort(quickArray);
+        long quickTime = System.currentTimeMillis() - start;
+
+        System.out.println("MergeSort (descending): " + mergeTime + " ms");
+        System.out.println("Arrays.sort (ascending): " + quickTime + " ms");
+
+        assertThat(sorter.getArray())
+                .as("Масив має бути відсортований за спаданням")
+                .isSortedAccordingTo(Comparator.reverseOrder());
+
+        assertThat(quickArray)
+                .as("Масив має бути відсортований за зростанням")
+                .isSorted();
     }
 }
