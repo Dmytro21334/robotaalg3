@@ -1,45 +1,10 @@
 import java.util.Arrays;
 
-public record MergeSort<T extends Comparable<T>>(T[] array) {
+public class MergeSort<T extends Comparable<T>> {
+    private final T[] array;
 
     public MergeSort(T[] array) {
         this.array = Arrays.copyOf(array, array.length);
-    }
-
-    public void mergeSortInRange(int leftIndex, int rightIndex, boolean ascending) {
-        if (leftIndex < 0 || rightIndex >= array.length || leftIndex >= rightIndex) {
-            throw new IllegalArgumentException("Invalid range");
-        }
-        mergeSortRecursive(array, leftIndex, rightIndex, ascending);
-    }
-
-    private void mergeSortRecursive(T[] array, int leftIndex, int rightIndex, boolean descending) {
-        if (rightIndex - leftIndex <= 0) return;
-
-        int middle = (leftIndex + rightIndex) / 2;
-
-        mergeSortRecursive(array, leftIndex, middle, descending);
-        mergeSortRecursive(array, middle + 1, rightIndex, descending);
-
-        merge(array, leftIndex, middle, rightIndex, descending);
-    }
-
-    private void merge(T[] array, int leftIndex, int middle, int rightIndex, boolean descending) {
-        int leftPointer = leftIndex;
-        int rightPointer = middle + 1;
-        T[] tempArray = Arrays.copyOf(array, array.length);
-
-        for (int i = leftIndex; i <= rightIndex; i++) {
-            if (leftPointer <= middle && (rightPointer > rightIndex ||
-                    (descending ? array[leftPointer].compareTo(array[rightPointer]) >= 0
-                            : array[leftPointer].compareTo(array[rightPointer]) <= 0))) {
-                tempArray[i] = array[leftPointer++];
-            } else {
-                tempArray[i] = array[rightPointer++];
-            }
-        }
-
-        System.arraycopy(tempArray, leftIndex, array, leftIndex, rightIndex - leftIndex + 1);
     }
 
     public T[] getArray() {
@@ -47,5 +12,41 @@ public record MergeSort<T extends Comparable<T>>(T[] array) {
     }
 
     public void mergeSortDescending() {
+        mergeSortRecursive(0, array.length - 1, true);
+    }
+
+    public void mergeSortInRange(int leftIndex, int rightIndex, boolean ascending) {
+        if (leftIndex < 0 || rightIndex >= array.length || leftIndex >= rightIndex) {
+            throw new IllegalArgumentException("Invalid index range");
+        }
+        mergeSortRecursive(leftIndex, rightIndex, !ascending); // !ascending = descending
+    }
+
+    private void mergeSortRecursive(int left, int right, boolean descending) {
+        if (left >= right) return;
+
+        int mid = (left + right) / 2;
+        mergeSortRecursive(left, mid, descending);
+        mergeSortRecursive(mid + 1, right, descending);
+        merge(array, left, mid, right, descending);
+    }
+
+    private void merge(T[] array, int left, int mid, int right, boolean descending) {
+        T[] leftPart = Arrays.copyOfRange(array, left, mid + 1);
+        T[] rightPart = Arrays.copyOfRange(array, mid + 1, right + 1);
+
+        int i = 0, j = 0, k = left;
+
+        while (i < leftPart.length && j < rightPart.length) {
+            if ((descending && leftPart[i].compareTo(rightPart[j]) >= 0) ||
+                    (!descending && leftPart[i].compareTo(rightPart[j]) <= 0)) {
+                array[k++] = leftPart[i++];
+            } else {
+                array[k++] = rightPart[j++];
+            }
+        }
+
+        while (i < leftPart.length) array[k++] = leftPart[i++];
+        while (j < rightPart.length) array[k++] = rightPart[j++];
     }
 }
